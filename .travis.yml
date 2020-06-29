@@ -1,0 +1,35 @@
+language: node_js
+node_js:
+  - "node"
+
+install:
+  - npm install
+
+script:
+  - npm run build
+
+after_script:
+  # 部署
+  - cd ./dist
+  - git init
+  - git config user.name $U_NAME
+  - git config user.email $U_EMAIL
+  - git add .
+  - git commit -m "Update Blog By TravisCI With Build $TRAVIS_BUILD_NUMBER"
+  # Github Pages
+  - git push --force --quiet "https://$GITHUB_TOKEN@${GH_REF}" master:master
+  # Github Pages
+  - git push --quiet "https://$GITHUB_TOKEN@${GH_REF}" master:master --tags
+
+branches:
+  only:
+    - master
+
+deploy:
+ provider: pages
+ skip_cleanup: true
+ keep_history: true
+ github_token: $GITHUB_TOKEN
+ local_dir: dist
+ on:
+   branch: master
